@@ -87,7 +87,8 @@ HARBORPKG=harbor-arm
 VERSIONTAG=$(shell cat ./VERSION)
 BASEIMAGETAG=dev-arm
 BUILD_BASE=true
-PUSHBASEIMAGE=false
+PUSHBASEIMAGE=true
+IMAGENAMESPACE=harbor.adamkoro.com/goharbor
 BASEIMAGENAMESPACE=goharbor
 
 # #input true/false only
