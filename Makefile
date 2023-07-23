@@ -120,7 +120,6 @@ _update_makefile:
 _update_make_photon_makefile:
 	@echo "update goharbor photon makefile"
 	@$(SEDCMDI) 's/$(DOCKERCMD) build/$(DOCKERCMD) buildx build --platform linux\/arm64 --progress plain --output=type=docker/' $(HARBOR_PHOTON_MAKEFILE_PATH)
-	@$(SEDCMDI) '219 a \ \ \ \ \ \ \ \ docker buildx prune -f ; \\' $(HARBOR_PHOTON_MAKEFILE_PATH)
 
 _update_chartserver:
 	@echo "update goharbor chartserver compile.sh"
