@@ -70,6 +70,7 @@ MAKE_BUILD_BASE=build_base_docker
 MAKE_ONLINE=package_online
 MAKE_OFFLINE=package_offline
 MAKE_BUILD=build
+MAKE_PUSHIMAGE=pushimage
 
 # parameters
 BUILD_PG96=true
@@ -87,8 +88,8 @@ HARBORPKG=harbor-arm
 VERSIONTAG=$(shell cat ./VERSION)
 BASEIMAGETAG=dev-arm
 BUILD_BASE=true
-PUSHBASEIMAGE=true
-IMAGENAMESPACE=harbor.adamkoro.com/goharbor
+PUSHBASEIMAGE=false
+IMAGENAMESPACE=goharbor
 BASEIMAGENAMESPACE=goharbor
 
 # #input true/false only
@@ -101,8 +102,15 @@ ifeq ($(shell uname),Darwin)
     SEDCMDI=$(shell which gsed) -i
 endif
 
-# dockerhub user
-REGISTRYUSER=
+
+# docker user
+DOCKERHUB_USER=
+DOCKERHUB_PASSWORD=
+
+# registry user
+REGISTRYSERVER=
+REGISTRYUSER=$(IMAGENAMESPACE)
+REGISTRYPROJECTNAME=goharbor
 REGISTRYPASSWORD=
 
 _update_makefile:
@@ -188,6 +196,14 @@ package_online:
 build: 
 	@echo "build harbor-arm image"
 	cd $(SRCPATH) && make -f Makefile $(MAKE_BUILD) -e DEVFLAG=$(DEVFLAG) \
-	 -e REGISTRYUSER=$(REGISTRYUSER) -e REGISTRYPASSWORD=$(REGISTRYPASSWOR) \
+	 -e REGISTRYUSER=$(DOCKERHUB_USER) -e REGISTRYPASSWORD=$(DOCKERHUB_PASSWORD) \
+	 -e IMAGENAMESPACE=$(IMAGENAMESPACE) -e BASEIMAGETAG=$(BASEIMAGETAG) \
+	 -e PUSHBASEIMAGE=$(PUSHBASEIMAGE) \
 	 -e PULL_BASE_FROM_DOCKERHUB=$(PULL_BASE_FROM_DOCKERHUB) \
 	 -e BUILD_BASE=$(BUILD_BASE) -e VERSIONTAG=$(VERSIONTAG)
+
+pushimage:
+	@echo "push harbor images to registry"
+	cd $(SRCPATH) && make -f Makefile $(MAKE_PUSHIMAGE) -e REGISTRYUSER=$(REGISTRYUSER) \
+	 -e REGISTRYPASSWORD=$(REGISTRYPASSWORD) -e IMAGENAMESPACE=$(IMAGENAMESPACE) \
+	 -e REGISTRYSERVER=$(REGISTRYSERVER) -e VERSIONTAG=$(VERSIONTAG)
