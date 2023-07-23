@@ -41,7 +41,7 @@
 #
 # build:
 
-
+SOURCEPATH=$(CURDIR)
 BUILDPATH=$(CURDIR)/src/github.com/goharbor/harbor
 
 # default goharbor/harbor make path
@@ -54,7 +54,7 @@ HARBOR_PHOTON_NOTARY_DOCKERFILE_PATH=$(BUILDPATH)/make/photon/notary/binary.Dock
 HARBOR_PHOTON_NOTARY_BUILDER_PATH=$(BUILDPATH)/make/photon/notary/builder
 HARBOR_PHOTON_PORTAL_DOCKERFILE_PATH=$(BUILDPATH)/make/photon/portal/Dockerfile
 HARBOR_PHOTON_EXPORTER_PATH=$(BUILDPATH)/make/photon/exporter/Dockerfile
-HARBOR_PUSHIMAGE_PATH=$(BUILDPATH)/make/pushimage.sh
+HARBOR_PUSHIMAGE_PATH=$(SOURCEPATH)/scripts
 
 # download goharbor/harbor parammeters
 HARBOR_SOURCE_URL=https://github.com/goharbor/harbor.git
@@ -109,8 +109,8 @@ DOCKERHUB_PASSWORD=
 
 # registry user
 REGISTRYSERVER=
-REGISTRYUSER=$(IMAGENAMESPACE)
-REGISTRYPROJECTNAME=goharbor
+REGISTRYUSER=
+REGISTRYPROJECTNAME=$(IMAGENAMESPACE)
 REGISTRYPASSWORD=
 
 _update_makefile:
@@ -206,5 +206,5 @@ pushimage:
 	@echo "push harbor images to registry"
 	cd $(SRCPATH) && make -f Makefile $(MAKE_PUSHIMAGE) -e REGISTRYUSER=$(REGISTRYUSER) \
 	 -e REGISTRYPASSWORD=$(REGISTRYPASSWORD) -e IMAGENAMESPACE=$(IMAGENAMESPACE) \
-	 -e REGISTRYSERVER=$(REGISTRYSERVER) -e VERSIONTAG=$(VERSIONTAG) \
-	 -e PUSHSCRIPTPATH=./scripts
+	 -e REGISTRYSERVER=$(REGISTRYSERVER)/ -e VERSIONTAG=$(VERSIONTAG) \
+	 -e PUSHSCRIPTPATH=$(HARBOR_PUSHIMAGE_PATH)
