@@ -73,7 +73,7 @@ MAKE_BUILD=build
 
 # parameters
 BUILD_PG96=true
-DEVFLAG=true
+DEVFLAG=false
 BUILDBIN=true
 
 # package
