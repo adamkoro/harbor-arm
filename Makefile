@@ -59,7 +59,7 @@ HARBOR_PUSHIMAGE_PATH=$(BUILDPATH)/make/pushimage.sh
 # download goharbor/harbor parammeters
 HARBOR_SOURCE_URL=https://github.com/goharbor/harbor.git
 SRCPATH=src/github.com/goharbor/harbor
-HARBOR_TAG=release-2.3.0
+HARBOR_TAG=$(shell cat ./VERSION)
 
 # makefile path
 MAKEPATH=$(BUILDPATH)/make
@@ -84,7 +84,7 @@ HARBORPKG=harbor-arm
 
 
 # for docker image tag
-VERSIONTAG=dev-arm
+VERSIONTAG=$(shell cat ./VERSION)
 BASEIMAGETAG=dev-arm
 BUILD_BASE=true
 PUSHBASEIMAGE=false
