@@ -19,6 +19,7 @@ steps:
       TF_VAR_linode_authorized_keys:
         from_secret: linode_authorized_keys
     commands:
+      - pwd
       - export $(cat /build_env/linode_root_pass | xargs)
       - terraform -chdir=terraform/ init 
       - terraform -chdir=terraform/ plan
