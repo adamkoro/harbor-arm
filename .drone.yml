@@ -3,9 +3,23 @@ name: build
 type: kubernetes
 
 steps:
-  - name: create_linode
-    image: harbor.adamkoro.com/library/terraform:1.5.3
+  - name: create_env
+    image: harbor.adamkoro.com/bci/bci-base:15.5
+    environment:
+      LINODE_TOKEN:
+        from_secret: linode_token
+      LINODE_AUTHORIZED_KEYS:
+        from_secret: linode_authorized_keys
     commands:
-      - terraform -chdir=terraform/ init 
-      - terraform -chdir=terraform/ plan
-      - terraform -chdir=terraform/ apply -auto-approve
+      - env
+
+
+  #- name: create_linode
+  #  image: harbor.adamkoro.com/docker/hashicorp/terraform:1.5.3
+  #  environment:
+#
+  #    TF_VAR_linode_root_pass: ${LINODE_ROOT_PASS}
+  #  commands:
+  #    - terraform -chdir=terraform/ init 
+  #    - terraform -chdir=terraform/ plan
+  #    - terraform -chdir=terraform/ apply -auto-approve
