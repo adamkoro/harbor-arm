@@ -26,16 +26,32 @@ steps:
     volumes:
       - name: build_env
         path: /build_env
+      - name: terraform_cache
+        path: /terraform_cache
 
   - name: delete_linode
     image: harbor.adamkoro.com/docker/hashicorp/terraform:1.5.3
+    environment:
+      TF_VAR_linode_token:
+        from_secret: linode_token
+      TF_VAR_linode_authorized_keys:
+        from_secret: linode_authorized_keys
     commands:
+      - export $(cat /build_env/linode_root_pass | xargs)
       - terraform -chdir=terraform/ init 
       - terraform -chdir=terraform/ destroy -auto-approve
     volumes:
       - name: build_env
         path: /build_env
+      - name: terraform_cache
+        path: /terraform_cache
+    when:
+      status:
+        - failure
+        - success
 
 volumes:
   - name: build_env
+    temp: {}
+  - name: terraform_cache
     temp: {}
