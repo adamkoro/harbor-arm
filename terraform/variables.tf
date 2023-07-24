@@ -14,7 +14,7 @@ variable "linode_region" {
 variable "linode_type" {
   description = "Linode Type"
   type        = string
-  default     = "g6-standard-2"
+  default     = "g6-standard-6"
 }
 
 variable "linode_image" {
