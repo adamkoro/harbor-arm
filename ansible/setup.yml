@@ -91,48 +91,24 @@
         dest: "{{ harbor_root_dir }}"
         version: main
         force: true
-      register: git_output
-
-    - name: Check if harbor-arm have an error
-      ansible.builtin.fail:
-        msg: "{{ git_output.msg }}"
-      when: git_output.failed
 
     - name: Download Harbor from Github
       community.general.make:
         chdir: "{{ harbor_root_dir }}"
         target: download
         file: "{{ harbor_root_dir }}/Makefile"
-      register: make_download_output
-
-    - name: Check if Harbor download have an error
-      ansible.builtin.fail:
-        msg: "{{ make_download_output.msg }}"
-      when: make_download_output.failed
 
     - name: Prepare Harbor arm data
       community.general.make:
         chdir: "{{ harbor_root_dir }}"
         target: prepare_arm_data
         file: "{{ harbor_root_dir }}/Makefile"
-      register: make_prepare_arm_data_output
-
-    - name: Check if Harbor prepare_arm_data have an error
-      ansible.builtin.fail:
-        msg: "{{ make_prepare_arm_data_output.msg }}"
-      when: make_prepare_arm_data_output.failed
 
     - name: Prepare Harbor for arm64 architecture
       community.general.make:
         chdir: "{{ harbor_root_dir }}"
         target: pre_update
         file: "{{ harbor_root_dir }}/Makefile"
-      register: make_pre_update_output
-
-    - name: Check if Harbor pre_update have an error
-      ansible.builtin.fail:
-        msg: "{{ make_pre_update_output.msg }}"
-      when: make_pre_update_output.failed
 
     - name: Compile Harbor components for arm64 architecture
       community.general.make:
@@ -141,12 +117,6 @@
         file: "{{ harbor_root_dir }}/Makefile"
         params:
           COMPILETAG: compile_golangimage
-      register: make_compile_output
-
-    - name: Check if Harbor compile have an error
-      ansible.builtin.fail:
-        msg: "{{ make_compile_output.msg }}"
-      when: make_compile_output.failed
 
     - name: Build Harbor arm64 image
       community.general.make:
@@ -160,9 +130,3 @@
           TRIVYFLAG: "true"
           GEN_TLS: "true"
           PULL_BASE_FROM_DOCKERHUB: "false"
-      register: make_build_output
-
-    - name: Check if Harbor build have an error
-      ansible.builtin.fail:
-        msg: "{{ make_build_output.msg }}"
-      when: make_build_output.failed
