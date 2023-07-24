@@ -3,8 +3,9 @@
   gather_facts: true
   become: true
   vars:
-    harbor_root_dir: /root/goharbor
-    harbor_custom_git_repo: https://github.com/adamkoro/harbor-arm.git
+    harbor_root_dir: "/root/goharbor"
+    harbor_custom_git_repo: "https://github.com/adamkoro/harbor-arm.git"
+    pushimage: "false"
   tasks:
   # this section from: https://www.digitalocean.com/community/tutorials/how-to-use-ansible-to-install-and-set-up-docker-on-ubuntu-22-04
     - name: Install required system packages
@@ -130,3 +131,15 @@
           TRIVYFLAG: "true"
           GEN_TLS: "true"
           PULL_BASE_FROM_DOCKERHUB: "false"
+
+    - name: Push images to registry
+      community.general.make:
+        chdir: "{{ harbor_root_dir }}"
+        target: pushimage
+        file: "{{ harbor_root_dir }}/Makefile"
+        params:
+          REGISTRYSERVER: ""
+          REGISTRYUSER: ""
+          REGISTRYPASSWORD: ""
+
+      when: pushimage == "true"
