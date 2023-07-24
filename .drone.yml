@@ -1,0 +1,11 @@
+kind: pipeline
+name: build
+type: kubernetes
+
+steps:
+  - name: create_linode
+    image: harbor.adamkoro.com/library/terraform:1.5.3
+    commands:
+      - terraform -chdir=terraform/ init 
+      - terraform -chdir=terraform/ plan
+      - terraform -chdir=terraform/ apply -auto-approve
