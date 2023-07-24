@@ -13,7 +13,7 @@ steps:
     commands:
       - echo "TF_VAR_linode_root_pass=$(openssl rand -base64 32 | tr -d '\n' | base64 -w 0)" >> /build_env/terraform_envs
       - echo "TF_VAR_linode_token=${LINODE_TOKEN}" >> /build_env/terraform_envs
-      - echo "TF_VAR_linode_authorized_keys=${LINODE_AUTHORIZED_KEYS}" >> /build_env/terraform_envs
+      - echo "TF_VAR_linode_authorized_keys=[ ${LINODE_AUTHORIZED_KEYS} ]" >> /build_env/terraform_envs
     volumes:
       - name: build_env
         path: /build_env
