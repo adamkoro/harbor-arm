@@ -141,5 +141,4 @@
           REGISTRYSERVER: ""
           REGISTRYUSER: ""
           REGISTRYPASSWORD: ""
-
       when: pushimage == "true"
