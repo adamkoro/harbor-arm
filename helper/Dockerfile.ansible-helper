@@ -1,4 +1,4 @@
-FROM harbor.adamkoro.com/bci/bci-base:15.4
+FROM harbor.adamkoro.com/bci/bci-base:15.5
 
-RUN zypper addrepo https://download.opensuse.org/repositories/systemsmanagement/15.4/systemsmanagement.repo && zypper --gpg-auto-import-keys refresh
-RUN zypper -n install ansible ansible-playbook
+RUN zypper addrepo https://download.opensuse.org/repositories/systemsmanagement:/ansible/openSUSE_Tumbleweed/ && zypper --gpg-auto-import-keys refresh
+RUN zypper -n install ansible
