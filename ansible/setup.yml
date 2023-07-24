@@ -74,11 +74,16 @@
         msg: "arm64 is not enabled"
       when: buildx_output is not search("linux/arm64")
 
+    - name: Check if exits {{ harbor_root_dir }}
+      ansible.builtin.stat:
+        path: "{{ harbor_root_dir }}"
+      register: stat_harbor_root_dir_output
+
     - name: Remove previus {{ harbor_root_dir }}
       ansible.builtin.file:
         path: "{{ harbor_root_dir }}"
         state: absent
-      register: remove_harbor_root_dir_output
+      when: stat_harbor_root_dir_output.stat.exists
 
     - name: Download harbor-arm repo
       ansible.builtin.git:
