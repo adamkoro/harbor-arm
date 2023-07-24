@@ -1,0 +1,4 @@
+FROM harbor.adamkoro.com/bci/bci-base:15.4
+
+RUN zypper addrepo https://download.opensuse.org/repositories/systemsmanagement/15.4/systemsmanagement.repo && zypper refresh
+RUN zypper -n install ansible ansible-playbook
