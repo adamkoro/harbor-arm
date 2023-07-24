@@ -11,15 +11,33 @@ steps:
       LINODE_AUTHORIZED_KEYS:
         from_secret: linode_authorized_keys
     commands:
-      - env
+      - echo "TF_VAR_linode_root_pass=$(openssl rand -base64 32 | tr -d '\n' | base64 -w 0)" >> /build_env/terraform_envs
+      - echo "TF_VAR_linode_token=${LINODE_TOKEN}" >> /build_env/terraform_envs
+      - echo "TF_VAR_linode_authorized_keys=${LINODE_AUTHORIZED_KEYS}" >> /build_env/terraform_envs
+    volumes:
+      - name: build_env
+        path: /build_env
 
+  - name: create_linode
+    image: harbor.adamkoro.com/docker/hashicorp/terraform:1.5.3
+    commands:
+      - export $(cat /build_env/terraform_envs | xargs)
+      - terraform -chdir=terraform/ init 
+      - terraform -chdir=terraform/ plan
+      - terraform -chdir=terraform/ apply -auto-approve
+    volumes:
+      - name: build_env
+        path: /build_env
 
-  #- name: create_linode
-  #  image: harbor.adamkoro.com/docker/hashicorp/terraform:1.5.3
-  #  environment:
-#
-  #    TF_VAR_linode_root_pass: ${LINODE_ROOT_PASS}
-  #  commands:
-  #    - terraform -chdir=terraform/ init 
-  #    - terraform -chdir=terraform/ plan
-  #    - terraform -chdir=terraform/ apply -auto-approve
+  - name: delete_linode
+    image: harbor.adamkoro.com/docker/hashicorp/terraform:1.5.3
+    commands:
+      - terraform -chdir=terraform/ init 
+      - terraform -chdir=terraform/ destroy -auto-approve
+    volumes:
+      - name: build_env
+        path: /build_env
+
+volumes:
+  - name: build_env
+    temp: {}
