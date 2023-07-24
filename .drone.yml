@@ -27,8 +27,6 @@ steps:
     volumes:
       - name: build_env
         path: /build_env
-      - name: terraform_cache
-        path: /drone/src/terraform
 
   - name: delete_linode
     image: harbor.adamkoro.com/docker/hashicorp/terraform:1.5.3
@@ -44,8 +42,6 @@ steps:
     volumes:
       - name: build_env
         path: /build_env
-      - name: terraform_cache
-        path: /drone/src/terraform
     when:
       status:
         - failure
@@ -53,6 +49,4 @@ steps:
 
 volumes:
   - name: build_env
-    temp: {}
-  - name: terraform_cache
     temp: {}
