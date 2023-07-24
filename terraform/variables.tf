@@ -38,5 +38,6 @@ variable "linode_root_pass" {
 variable "linode_authorized_keys" {
   description = "Linode Authorized Keys"
   type        = string
+  default     = []
 }
 
