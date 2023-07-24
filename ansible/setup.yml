@@ -2,6 +2,9 @@
   hosts: all
   gather_facts: true
   become: true
+  vars:
+    harbor_root_dir: /root/goharbor
+    harbor_custom_git_repo: https://github.com/adamkoro/harbor-arm.git
   tasks:
   # this section from: https://www.digitalocean.com/community/tutorials/how-to-use-ansible-to-install-and-set-up-docker-on-ubuntu-22-04
     - name: Install required system packages
@@ -26,7 +29,7 @@
       ansible.builtin.apt_repository:
         repo: deb https://download.docker.com/linux/ubuntu jammy stable
         state: present
-      when: ansible_distribution_release == "Ubuntu" and ansible_distribution_version == "22.04"
+      when: ansible_distribution == "Ubuntu" and ansible_distribution_version == "22.04" and ansible_distribution_release == "jammy"
 
     - name: Update apt and install docker-ce
       ansible.builtin.apt:
@@ -52,9 +55,9 @@
         image: tonistiigi/binfmt:latest
         command: --install all
         privileged: true
-        state: present
-        auto_remove: true
+        state: started
         cleanup: true
+        detach: false
 
     - name: Get buildx setting
       ansible.builtin.command: docker buildx ls
@@ -64,4 +67,91 @@
     - name: Check if arm64 is enabled
       ansible.builtin.debug:
         msg: "arm64 is enabled"
-      when: buildx_output.stdout.find("arm64") != -1
+      when: buildx_output is search("linux/arm64")
+
+    - name: Check if arm64 is not enabled
+      ansible.builtin.fail:
+        msg: "arm64 is not enabled"
+      when: buildx_output is not search("linux/arm64")
+
+    - name: Download harbor-arm repo
+      ansible.builtin.git:
+        repo: "{{ harbor_custom_git_repo }}"
+        dest: "{{ harbor_root_dir }}"
+        version: main
+        force: true
+      register: git_output
+
+    - name: Check if harbor-arm have an error
+      ansible.builtin.fail:
+        msg: "{{ git_output.msg }}"
+      when: git_output.failed
+
+    - name: Download Harbor from Github
+      community.general.make:
+        chdir: "{{ harbor_root_dir }}"
+        target: download
+        file: "{{ harbor_root_dir }}/Makefile"
+      register: make_download_output
+
+    - name: Check if Harbor download have an error
+      ansible.builtin.fail:
+        msg: "{{ make_download_output.msg }}"
+      when: make_download_output.failed
+
+    - name: Prepare Harbor arm data
+      community.general.make:
+        chdir: "{{ harbor_root_dir }}"
+        target: prepare_arm_data
+        file: "{{ harbor_root_dir }}/Makefile"
+      register: make_prepare_arm_data_output
+
+    - name: Check if Harbor prepare_arm_data have an error
+      ansible.builtin.fail:
+        msg: "{{ make_prepare_arm_data_output.msg }}"
+      when: make_prepare_arm_data_output.failed
+
+    - name: Prepare Harbor for arm64 architecture
+      community.general.make:
+        chdir: "{{ harbor_root_dir }}"
+        target: pre_update
+        file: "{{ harbor_root_dir }}/Makefile"
+      register: make_pre_update_output
+
+    - name: Check if Harbor pre_update have an error
+      ansible.builtin.fail:
+        msg: "{{ make_pre_update_output.msg }}"
+      when: make_pre_update_output.failed
+
+    - name: Compile Harbor components for arm64 architecture
+      community.general.make:
+        chdir: "{{ harbor_root_dir }}"
+        target: compile
+        file: "{{ harbor_root_dir }}/Makefile"
+        params:
+          COMPILETAG: compile_golangimage
+      register: make_compile_output
+
+    - name: Check if Harbor compile have an error
+      ansible.builtin.fail:
+        msg: "{{ make_compile_output.msg }}"
+      when: make_compile_output.failed
+
+    - name: Build Harbor arm64 image
+      community.general.make:
+        chdir: "{{ harbor_root_dir }}"
+        target: build
+        file: "{{ harbor_root_dir }}/Makefile"
+        params:
+          GOBUILDTAGS: "include_oss include_gcs"
+          BUILDBIN: "true"
+          NOTARYFLAG: "true"
+          TRIVYFLAG: "true"
+          GEN_TLS: "true"
+          PULL_BASE_FROM_DOCKERHUB: "false"
+      register: make_build_output
+
+    - name: Check if Harbor build have an error
+      ansible.builtin.fail:
+        msg: "{{ make_build_output.msg }}"
+      when: make_build_output.failed
