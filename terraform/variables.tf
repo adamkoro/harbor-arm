@@ -40,3 +40,8 @@ variable "linode_authorized_keys" {
   type        = string
 }
 
+variable "linode_ip_address_file" {
+  description = "Linode IP Address"
+  type        = string
+  default     = "/build_env/linode_ip_address"
+}

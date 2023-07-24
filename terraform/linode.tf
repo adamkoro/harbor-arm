@@ -7,10 +7,8 @@ resource "linode_instance" "harbor_build" {
   root_pass       = var.linode_root_pass
 }
 
-# Path: terraform/outputs.tf
-# Compare this snippet from terraform/outputs.tf:
-output "ip_address" {
-  value = linode_instance.harbor_build.ip_address
+resource "local_file" "linode_ip_address" {
+    content  = "TF_VAR_linode_ip=${linode_instance.harbor_build.ip_address}"
+    filename = var.linode_ip_address_file
 }
-
 
