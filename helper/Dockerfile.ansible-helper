@@ -2,7 +2,7 @@ FROM harbor.adamkoro.com/docker/library/ubuntu:22.04
 
 RUN apt-get update && apt-get upgrade -y
 
-RUN apt-get install -y ansbile ansible-lint ansible-playbook && \
+RUN apt-get install -y ansible ansible-lint && \
     apt-get clean && \
     apt-get autoremove && \
     rm -rf /var/lib/apt/lists/*
