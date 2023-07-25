@@ -87,3 +87,6 @@ steps:
 volumes:
   - name: build_env
     temp: {}
+
+node:
+  type: home-arm64
