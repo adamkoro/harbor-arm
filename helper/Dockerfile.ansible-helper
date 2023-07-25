@@ -1,4 +1,8 @@
-FROM harbor.adamkoro.com/bci/bci-base:15.5
+FROM harbor.adamkoro.com/docker/library/ubuntu:22.04
 
-RUN zypper addrepo https://download.opensuse.org/repositories/systemsmanagement/15.4/systemsmanagement.repo && zypper --gpg-auto-import-keys refresh
-RUN zypper -n install ansible
+RUN apt-get update && apt-get upgrade -y
+
+RUN apt-get install -y ansbile ansible-lint ansible-playbook && \
+    apt-get clean && \
+    apt-get autoremove && \
+    rm -rf /var/lib/apt/lists/*
