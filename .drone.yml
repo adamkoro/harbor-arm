@@ -2,6 +2,10 @@ kind: pipeline
 name: build-harbor
 type: kubernetes
 
+platform:
+  os: linux
+  arch: arm64
+
 steps:
   - name: generate_password
     image: harbor.adamkoro.com/bci/bci-base:15.5
@@ -75,7 +79,11 @@ node:
 ---
 kind: pipeline
 name: build-ansible-helper
-type: kubernetes
+type: docker
+
+platform:
+  os: linux
+  arch: amd64
 
 steps:
   - name: build_helper
