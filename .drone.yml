@@ -98,7 +98,7 @@ steps:
       - /kaniko/executor
         --context "."
         --dockerfile "./helper/Dockerfile.ansible-helper"
-        --destination "harbor.adamkoro.com/library/ansible-helper:latest"
+        --destination "registry.adamkoro.com/library/ansible-helper:latest"
 
 node:
   type: hosted-amd64
