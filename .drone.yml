@@ -1,78 +1,78 @@
-kind: pipeline
-name: build-harbor
-type: kubernetes
-
-steps:
-  - name: generate_password
-    image: harbor.adamkoro.com/bci/bci-base:15.5
-    commands:
-      - echo "TF_VAR_linode_root_pass=$(openssl rand -base64 32 | tr -d '\n' | base64 -w 0)" > /build_env/linode_root_pass
-    volumes:
-      - name: build_env
-        path: /build_env
-
-  - name: create_linode
-    image: harbor.adamkoro.com/docker/hashicorp/terraform:1.5.3
-    environment:
-      TF_VAR_linode_token:
-        from_secret: linode_token
-      TF_VAR_linode_authorized_keys:
-        from_secret: linode_authorized_keys
-    commands:
-      - export $(cat /build_env/linode_root_pass | xargs)
-      - terraform -chdir=terraform/ init 
-      - terraform -chdir=terraform/ plan
-      - terraform -chdir=terraform/ apply -auto-approve
-    volumes:
-      - name: build_env
-        path: /build_env
-    when:
-      status:
-        - success
-
-  - name: run_playbook
-    image: harbor.adamkoro.com/library/ansible-helper:latest
-    environment:
-      ANSIBLE_USER: root
-    commands:
-      - export $(cat /build_env/linode_root_pass | xargs)
-      - export $(cat /build_env/linode_ip_address | xargs)
-      - env
-      - ansible-galaxy collection install community.docker
-      - ansible ansible/setup.yml -e ansible_user='{{ lookup("env", "ANSIBLE_USER") }}' -e ansible_password='{{ lookup("env", "TF_VAR_linode_root_pass") }}' -e ansible_ssh_common_args='-o StrictHostKeyChecking=no' -e ansible_host='{{ lookup("env", "TF_VAR_linode_ip") }}'
-    volumes:
-      - name: build_env
-        path: /build_env
-    when:
-      status:
-        - success
-
-  - name: delete_linode
-    image: harbor.adamkoro.com/docker/hashicorp/terraform:1.5.3
-    environment:
-      TF_VAR_linode_token:
-        from_secret: linode_token
-      TF_VAR_linode_authorized_keys:
-        from_secret: linode_authorized_keys
-    commands:
-      - export $(cat /build_env/linode_root_pass | xargs)
-      - terraform -chdir=terraform/ init 
-      - terraform -chdir=terraform/ destroy -auto-approve
-    volumes:
-      - name: build_env
-        path: /build_env
-    when:
-      status:
-        - failure
-        - success
-
-volumes:
-  - name: build_env
-    temp: {}
-
-node:
-  type: home-arm64
----
+#kind: pipeline
+#name: build-harbor
+#type: kubernetes
+#
+#steps:
+#  - name: generate_password
+#    image: harbor.adamkoro.com/bci/bci-base:15.5
+#    commands:
+#      - echo "TF_VAR_linode_root_pass=$(openssl rand -base64 32 | tr -d '\n' | base64 -w 0)" > /build_env/linode_root_pass
+#    volumes:
+#      - name: build_env
+#        path: /build_env
+#
+#  - name: create_linode
+#    image: harbor.adamkoro.com/docker/hashicorp/terraform:1.5.3
+#    environment:
+#      TF_VAR_linode_token:
+#        from_secret: linode_token
+#      TF_VAR_linode_authorized_keys:
+#        from_secret: linode_authorized_keys
+#    commands:
+#      - export $(cat /build_env/linode_root_pass | xargs)
+#      - terraform -chdir=terraform/ init 
+#      - terraform -chdir=terraform/ plan
+#      - terraform -chdir=terraform/ apply -auto-approve
+#    volumes:
+#      - name: build_env
+#        path: /build_env
+#    when:
+#      status:
+#        - success
+#
+#  - name: run_playbook
+#    image: harbor.adamkoro.com/library/ansible-helper:latest
+#    environment:
+#      ANSIBLE_USER: root
+#    commands:
+#      - export $(cat /build_env/linode_root_pass | xargs)
+#      - export $(cat /build_env/linode_ip_address | xargs)
+#      - env
+#      - ansible-galaxy collection install community.docker
+#      - ansible ansible/setup.yml -e ansible_user='{{ lookup("env", "ANSIBLE_USER") }}' -e ansible_password='{{ lookup("env", "TF_VAR_linode_root_pass") }}' -e ansible_ssh_common_args='-o StrictHostKeyChecking=no' -e ansible_host='{{ lookup("env", "TF_VAR_linode_ip") }}'
+#    volumes:
+#      - name: build_env
+#        path: /build_env
+#    when:
+#      status:
+#        - success
+#
+#  - name: delete_linode
+#    image: harbor.adamkoro.com/docker/hashicorp/terraform:1.5.3
+#    environment:
+#      TF_VAR_linode_token:
+#        from_secret: linode_token
+#      TF_VAR_linode_authorized_keys:
+#        from_secret: linode_authorized_keys
+#    commands:
+#      - export $(cat /build_env/linode_root_pass | xargs)
+#      - terraform -chdir=terraform/ init 
+#      - terraform -chdir=terraform/ destroy -auto-approve
+#    volumes:
+#      - name: build_env
+#        path: /build_env
+#    when:
+#      status:
+#        - failure
+#        - success
+#
+#volumes:
+#  - name: build_env
+#    temp: {}
+#
+#node:
+#  type: home-arm64
+#---
 kind: pipeline
 name: build-ansible-helper
 type: docker
@@ -91,6 +91,3 @@ steps:
         --context "."
         --dockerfile "./helper/Dockerfile.ansible-helper"
         --destination "harbor.adamkoro.com/library/ansible-helper:latest"
-
-node:
-  type: hosted-amd64
