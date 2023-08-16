@@ -1,26 +1,8 @@
 kind: pipeline
-name: build
+name: build-harbor
 type: kubernetes
 
 steps:
-  - name: build_helper
-    image: gcr.io/kaniko-project/executor:v1.12.0-debug
-    environment:
-      HARBOR_USERNAME:
-        from_secret: harbor_username
-      HARBOR_PASSWORD:
-        from_secret: harbor_password
-    commands:
-      -  echo "{\"auths\":{\"harbor.adamkoro.com\":{\"auth\":\"$(printf "%s:%s" "$HARBOR_USERNAME" "$HARBOR_PASSWORD" | base64 )\"}}}" > /kaniko/.docker/config.json
-      - /kaniko/executor
-        --context "."
-        --dockerfile "./helper/Dockerfile.ansible-helper"
-        --destination "harbor.adamkoro.com/library/ansible-helper:latest"
-    when:
-      change:
-        - helper/Dockerfile.ansible-helper
-        - .drone.yml
-
   - name: generate_password
     image: harbor.adamkoro.com/bci/bci-base:15.5
     commands:
@@ -90,3 +72,25 @@ volumes:
 
 node:
   type: home-arm64
+---
+kind: pipeline
+name: build-ansible-helper
+type: docker
+
+steps:
+  - name: build_helper
+    image: gcr.io/kaniko-project/executor:v1.12.0-debug
+    environment:
+      HARBOR_USERNAME:
+        from_secret: registry_username
+      HARBOR_PASSWORD:
+        from_secret: registry_password
+    commands:
+      -  echo "{\"auths\":{\"registry.adamkoro.com\":{\"auth\":\"$(printf "%s:%s" "$HARBOR_USERNAME" "$HARBOR_PASSWORD" | base64 )\"}}}" > /kaniko/.docker/config.json
+      - /kaniko/executor
+        --context "."
+        --dockerfile "./helper/Dockerfile.ansible-helper"
+        --destination "harbor.adamkoro.com/library/ansible-helper:latest"
+
+node:
+  type: hosted-amd64
