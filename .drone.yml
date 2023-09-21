@@ -46,7 +46,7 @@ steps:
       - export ANSIBLE_PASSWORD=$(echo $TF_VAR_linode_root_pass)
       - export ANSIBLE_HOST_KEY_CHECKING=False
       - ansible-galaxy collection install community.docker
-      - ansible-playbook ansible/setup.yml
+      - ansible-playbook ansible/setup.yml -i "'"${ANSIBLE_HOSTS},"'" -e "ansible_user=${ANSIBLE_USER} ansible_password=${ANSIBLE_PASSWORD} ansible_host_key_checking=${ANSIBLE_HOST_KEY_CHECKING}"
     volumes:
       - name: build_env
         path: /build_env
