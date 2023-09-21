@@ -1,14 +1,14 @@
 kind: pipeline
 name: build-harbor
-type: kubernetes
+type: docker
 
 platform:
   os: linux
-  arch: arm64
+  arch: amd64
 
 steps:
   - name: generate_password
-    image: harbor.adamkoro.com/bci/bci-base:15.5
+    image: registry.adamkoro.com/bci/bci-base:15.5
     commands:
       - echo "TF_VAR_linode_root_pass=$(openssl rand -base64 32 | tr -d '\n' | base64 -w 0)" > /build_env/linode_root_pass
     volumes:
@@ -16,7 +16,7 @@ steps:
         path: /build_env
 
   - name: create_linode
-    image: harbor.adamkoro.com/docker/hashicorp/terraform:1.5.3
+    image: registry.adamkoro.com/docker/hashicorp/terraform:1.5.3
     environment:
       TF_VAR_linode_token:
         from_secret: linode_token
@@ -35,7 +35,7 @@ steps:
         - success
 
   - name: run_playbook
-    image: harbor.adamkoro.com/library/ansible-helper:latest
+    image: registry.adamkoro.com/library/ansible-helper:latest
     environment:
       ANSIBLE_USER: root
     commands:
@@ -52,7 +52,7 @@ steps:
         - success
 
   - name: delete_linode
-    image: harbor.adamkoro.com/docker/hashicorp/terraform:1.5.3
+    image: registry.adamkoro.com/docker/hashicorp/terraform:1.5.3
     environment:
       TF_VAR_linode_token:
         from_secret: linode_token
@@ -75,30 +75,30 @@ volumes:
     temp: {}
 
 node:
-  type: home-arm64
----
-kind: pipeline
-name: build-ansible-helper
-type: docker
-
-platform:
-  os: linux
-  arch: amd64
-
-steps:
-  - name: build_helper
-    image: gcr.io/kaniko-project/executor:v1.12.0-debug
-    environment:
-      HARBOR_USERNAME:
-        from_secret: registry_username
-      HARBOR_PASSWORD:
-        from_secret: registry_password
-    commands:
-      -  echo "{\"auths\":{\"registry.adamkoro.com\":{\"auth\":\"$(printf "%s:%s" "$HARBOR_USERNAME" "$HARBOR_PASSWORD" | base64 )\"}}}" > /kaniko/.docker/config.json
-      - /kaniko/executor
-        --context "."
-        --dockerfile "./helper/Dockerfile.ansible-helper"
-        --destination "registry.adamkoro.com/library/ansible-helper:latest"
-
-node:
   type: hosted-amd64
+#---
+#kind: pipeline
+#name: build-ansible-helper
+#type: docker
+#
+#platform:
+#  os: linux
+#  arch: amd64
+#
+#steps:
+#  - name: build_helper
+#    image: gcr.io/kaniko-project/executor:v1.12.0-debug
+#    environment:
+#      HARBOR_USERNAME:
+#        from_secret: registry_username
+#      HARBOR_PASSWORD:
+#        from_secret: registry_password
+#    commands:
+#      -  echo "{\"auths\":{\"registry.adamkoro.com\":{\"auth\":\"$(printf "%s:%s" "$HARBOR_USERNAME" "$HARBOR_PASSWORD" | base64 )\"}}}" > /kaniko/.docker/config.json
+#      - /kaniko/executor
+#        --context "."
+#        --dockerfile "./helper/Dockerfile.ansible-helper"
+#        --destination "registry.adamkoro.com/library/ansible-helper:latest"
+#
+#node:
+#  type: hosted-amd64
