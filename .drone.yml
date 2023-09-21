@@ -8,7 +8,7 @@ platform:
 
 steps:
   - name: generate_password
-    image: registry.adamkoro.com/bci/bci-base:15.5
+    image: registry.suse.com/bci/bci-base:15.5
     commands:
       - echo "TF_VAR_linode_root_pass=$(openssl rand -base64 32 | tr -d '\n' | base64 -w 0)" > /build_env/linode_root_pass
     volumes:
