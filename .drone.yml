@@ -16,7 +16,7 @@ steps:
         path: /build_env
 
   - name: create_linode
-    image: registry.adamkoro.com/docker/hashicorp/terraform:1.5.3
+    image: registry.adamkoro.com/docker/hashicorp/terraform:1.5.5
     environment:
       TF_VAR_linode_token:
         from_secret: linode_token
@@ -52,7 +52,7 @@ steps:
         - success
 
   - name: delete_linode
-    image: registry.adamkoro.com/docker/hashicorp/terraform:1.5.3
+    image: registry.adamkoro.com/docker/hashicorp/terraform:1.5.5
     environment:
       TF_VAR_linode_token:
         from_secret: linode_token
