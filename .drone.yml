@@ -41,9 +41,12 @@ steps:
     commands:
       - export $(cat /build_env/linode_root_pass | xargs)
       - export $(cat /build_env/linode_ip_address | xargs)
-      - env
+      - export ANSIBLE_HOST=$(echo $TF_VAR_linode_ip)
+      - export ANSIBLE_USER=root
+      - export ANSIBLE_PASSWORD=$(echo $TF_VAR_linode_root_pass)
+      - export ANSIBLE_HOST_KEY_CHECKING=False
       - ansible-galaxy collection install community.docker
-      - ansible-playbook ansible/setup.yml -e ansible_user='{{ lookup("env", "ANSIBLE_USER") }}' -e ansible_password='{{ lookup("env", "TF_VAR_linode_root_pass") }}' -e ansible_ssh_common_args='-o StrictHostKeyChecking=no' -e ansible_host='{{ lookup("env", "TF_VAR_linode_ip") }}'
+      - ansible-playbook ansible/setup.yml
     volumes:
       - name: build_env
         path: /build_env
