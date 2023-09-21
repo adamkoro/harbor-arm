@@ -90,7 +90,7 @@ steps:
     image: gcr.io/kaniko-project/executor:v1.12.0-debug
     environment:
       HARBOR_USERNAME:
-        from_secret: registry_username
+        from_secret: registry_user
       HARBOR_PASSWORD:
         from_secret: registry_password
     commands:
