@@ -1,4 +1,4 @@
-FROM harbor.adamkoro.com/docker/library/ubuntu:22.04
+FROM registry.adamkoro.com/docker/library/ubuntu:22.04
 
 RUN apt-get update && apt-get upgrade -y
 
