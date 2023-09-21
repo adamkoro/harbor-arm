@@ -41,7 +41,7 @@ steps:
     commands:
       - export $(cat /build_env/linode_root_pass | xargs)
       - export $(cat /build_env/linode_ip_address | xargs)
-      #- env
+      - env
       - ansible-galaxy collection install community.docker
       - ansible-playbook ansible/setup.yml -e ansible_user='{{ lookup("env", "ANSIBLE_USER") }}' -e ansible_password='{{ lookup("env", "TF_VAR_linode_root_pass") }}' -e ansible_ssh_common_args='-o StrictHostKeyChecking=no' -e ansible_host='{{ lookup("env", "TF_VAR_linode_ip") }}'
     volumes:
