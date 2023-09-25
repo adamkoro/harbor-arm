@@ -32,7 +32,7 @@ steps:
       TF_VAR_linode_authorized_keys:
         from_secret: linode_authorized_keys
       TF_VAR_linode_label: "goharbor-arm-build-${DRONE_COMMIT_SHA:0:7}"
-      TF_VAR_linode_type: g6-standard-4
+      TF_VAR_linode_type: g6-standard-8
       TF_VAR_linode_region: it-mil
     commands:
       - export $(cat /build_env/linode_root_pass | xargs)
@@ -89,8 +89,13 @@ steps:
     image: registry.adamkoro.com/library/ansible:latest
     environment:
       ANSIBLE_USER: root
+      REGISTRY: registry.adamkoro.com
+      REGISTRY_USER:
+        from_secret: registry_user
+      REGISTRY_PASS:
+        from_secret: registry_pass
     commands:
-      - ansible-playbook ansible/build.yml -i $(cat /build_env/linode_ip_address | cut -d'=' -f2),
+      - ansible-playbook ansible/build.yml -i $(cat /build_env/linode_ip_address | cut -d'=' -f2), -e "registry_server=$REGISTRY registry_user=$REGISTRY_USER REGISTRY_PASS=$registry_password"
     volumes:
       - name: build_env
         path: /build_env

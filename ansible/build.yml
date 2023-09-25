@@ -5,7 +5,7 @@
   vars:
     harbor_root_dir: "/root/goharbor"
     harbor_custom_git_repo: "https://github.com/adamkoro/harbor-arm.git"
-    pushimage: "false"
+    pushimage: "true"
   tasks:
     - name: Check if exits {{ harbor_root_dir }}
       ansible.builtin.stat:
@@ -70,7 +70,7 @@
         target: pushimage
         file: "{{ harbor_root_dir }}/Makefile"
         params:
-          REGISTRYSERVER: ""
-          REGISTRYUSER: ""
-          REGISTRYPASSWORD: ""
+          REGISTRYSERVER: "{{ registry_server }}"
+          REGISTRYUSER: "{{ registry_user }}"
+          REGISTRYPASSWORD: "{{ registry_password }}"
       when: pushimage == "true"
