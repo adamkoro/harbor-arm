@@ -95,7 +95,7 @@ steps:
       REGISTRY_PASS:
         from_secret: registry_pass
     commands:
-      - ansible-playbook ansible/build.yml -i $(cat /build_env/linode_ip_address | cut -d'=' -f2), -e "registry_server=$REGISTRY registry_user=$REGISTRY_USER REGISTRY_PASS=$registry_password"
+      - ansible-playbook ansible/build.yml -i $(cat /build_env/linode_ip_address | cut -d'=' -f2), -e "registry_server=$REGISTRY registry_user=$REGISTRY_USER registry_password=$REGISTRY_PASS"
     volumes:
       - name: build_env
         path: /build_env
