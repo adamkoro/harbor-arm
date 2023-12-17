@@ -89,11 +89,11 @@ steps:
     image: registry.adamkoro.com/library/ansible:latest
     environment:
       ANSIBLE_USER: root
-      REGISTRY: registry.adamkoro.com
+      REGISTRY: docker.io
       REGISTRY_USER:
-        from_secret: registry_user
+        from_secret: docker_user
       REGISTRY_PASS:
-        from_secret: registry_pass
+        from_secret: docker_pass
     commands:
       - ansible-playbook ansible/build.yml -i $(cat /build_env/linode_ip_address | cut -d'=' -f2), -e "registry_server=$REGISTRY registry_user=$REGISTRY_USER registry_password=$REGISTRY_PASS"
     volumes:
