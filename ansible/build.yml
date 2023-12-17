@@ -64,6 +64,12 @@
           GEN_TLS: "true"
           PULL_BASE_FROM_DOCKERHUB: "false"
 
+    - name: Requirment for image push
+      ansible.builtin.apt:
+        name:
+          - golang
+      when: pushimage == "true"
+
     - name: Push images to registry
       community.general.make:
         chdir: "{{ harbor_root_dir }}"
