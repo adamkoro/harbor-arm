@@ -159,7 +159,7 @@ _update_exporter:
 
 
 
-pre_update: _update_makefile _update_make_photon_makefile _update_registry _update_trivy-adapter _update_notary _update_portal _update_exporter
+pre_update: _update_makefile _update_make_photon_makefile _update_registry _update_trivy-adapter _update_portal _update_exporter
 
 # downlaod goharbor/harbor source code
 download:
