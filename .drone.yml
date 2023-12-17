@@ -16,9 +16,8 @@ steps:
         path: /build_env
 
   - name: clone setup repo
-    image: registry.suse.com/bci/bci-base:15.5
+    image: registry.suse.com/suse/git:2.35
     commands:
-      - zypper ref && zypper -n in git
       - git clone https://github.com/adamkoro/linode_terraform.git /build_env/setup
     volumes:
       - name: build_env
